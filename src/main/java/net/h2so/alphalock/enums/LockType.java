@@ -11,7 +11,9 @@ public enum LockType {
 
     Read("读锁"),
 
-    Write("写锁");
+    Write("写锁"),
+
+    Fair("公平锁");
 
     String desc;
 

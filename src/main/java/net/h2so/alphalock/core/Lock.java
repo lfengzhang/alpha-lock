@@ -9,12 +9,14 @@ public interface Lock {
 
     /**
      * 获得锁
+     *
      * @return
      */
     boolean acquire();
 
     /**
      * 释放锁
+     *
      * @return
      */
     boolean release();
