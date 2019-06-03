@@ -1,4 +1,4 @@
-package net.h2so.alphalock.core;
+package net.h2so.alphalock.aspect;
 
 /**
  * @Description 切面加锁处理类
