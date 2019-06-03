@@ -1,14 +1,16 @@
 package net.h2so.alphalock.core;
 
 import net.h2so.alphalock.annotation.AlphaLock;
+import net.h2so.alphalock.exception.AlphaLockInvokeException;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Description 锁信息分析处理类
@@ -22,6 +24,7 @@ public class LockInfoAnalyseHandler {
     /**
      * 获得锁的KeyName
      * 格式: 全类名.方法名-{kValue1}-{kValue2}
+     *
      * @param joinPoint
      * @param alphaLock
      * @return
@@ -34,7 +37,11 @@ public class LockInfoAnalyseHandler {
         String lockKeyName = getCompleteDefinitionAndKey(alphaLock.keys(), method);
 
         /*替换Key值为业务值*/
-        lockKeyName = replaceKeyWithBusinessValue(lockKeyName, alphaLock.keys(), method, joinPoint.getArgs());
+        lockKeyName = replaceKeyWithBusinessValue(lockKeyName, alphaLock.keys(), method, joinPoint);
+
+        if (StringUtils.isEmpty(lockKeyName)) {
+            throw new AlphaLockInvokeException("lockKeyName is empty!");
+        }
 
         return lockKeyName;
     }
@@ -67,21 +74,57 @@ public class LockInfoAnalyseHandler {
     /**
      * 获取完整定义
      * 例: net.h2so.alphalock.core.LockInfoAnalyseHandler.getCompleteDefinition-{key1}-{key2}
+     *
      * @param
      * @param method
      * @return
      */
-    private String getCompleteDefinitionAndKey(String[] alphaKeys, Method method){
-        return null;
+    private String getCompleteDefinitionAndKey(String[] alphaKeys, Method method) {
+
+        StringBuilder completeDefineBuilder = new StringBuilder(method.getDeclaringClass().getName() + "." + method.getName());
+
+        for (String alphaKey : alphaKeys) {
+            if (StringUtils.isNotEmpty(alphaKey)) {
+                completeDefineBuilder.append("-");
+                completeDefineBuilder.append("{").append(alphaKey).append("}");
+            }
+        }
+
+        return completeDefineBuilder.toString();
     }
 
     /**
      * 将key替换为业务值
+     *
      * @param alphaKeys
      * @param method
      * @return
      */
-    private String replaceKeyWithBusinessValue(String completeDefinition, String[] alphaKeys, Method method, Object[] args) {
+    private String replaceKeyWithBusinessValue(String completeDefinition, String[] alphaKeys, Method method, ProceedingJoinPoint joinPoint) {
+
+        if (StringUtils.isEmpty(completeDefinition)) {
+            logger.error("completeDefinition is empty");
+            return completeDefinition;
+        }
+
+        /*
+         * 提取方法入参, 模式匹配后替换alphaKey
+         * java8+ 可以获取argNames
+         * */
+        Object[] argValues = joinPoint.getArgs();
+        String[] argNames = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
+        Map<String, Object> argMap = new HashMap<>();
+
+        for (int i = 0; i < argNames.length; i++) {
+            argMap.put(argNames[i], argValues[i]);
+        }
+
+        for (String alphaKey : alphaKeys) {
+            if (StringUtils.isNotEmpty(alphaKey)) {
+                Object value = argMap.get(alphaKey);
+                completeDefinition.replace(alphaKey, value.toString());
+            }
+        }
 
         return completeDefinition;
     }
