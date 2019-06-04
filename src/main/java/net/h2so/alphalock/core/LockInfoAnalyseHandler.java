@@ -1,7 +1,9 @@
 package net.h2so.alphalock.core;
 
 import net.h2so.alphalock.annotation.AlphaLock;
+import net.h2so.alphalock.enums.LockType;
 import net.h2so.alphalock.exception.AlphaLockInvokeException;
+import net.h2so.alphalock.model.LockInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -44,6 +46,23 @@ public class LockInfoAnalyseHandler {
         }
 
         return lockKeyName;
+    }
+
+    /**
+     * 获取锁的信息
+     *
+     * @param joinPoint
+     * @param alphaLock
+     * @return
+     */
+    public LockInfo get(ProceedingJoinPoint joinPoint, AlphaLock alphaLock) {
+        logger.debug("get lockInfo ... ");
+        LockType type = alphaLock.lockType();
+        String lockName = getLockKeyName(joinPoint, alphaLock);
+        long maxWaitTime = getMaxWaitTime(alphaLock);
+        long leaseTime = getLeaseTime(alphaLock);
+        logger.debug("get lockInfo ... type:{}, lockName:{}, maxWaitTime:{}, leaseTime:{}", type, lockName, maxWaitTime, leaseTime);
+        return new LockInfo(type, lockName, maxWaitTime, leaseTime);
     }
 
     /**
@@ -127,5 +146,27 @@ public class LockInfoAnalyseHandler {
         }
 
         return completeDefinition;
+    }
+
+    /**
+     * 获取最大等待时间
+     *
+     * @param alphaLock
+     * @return
+     */
+    private long getMaxWaitTime(AlphaLock alphaLock) {
+        //todo 设定默认值
+        return alphaLock.maxWaitTime() == Long.MIN_VALUE ? 60 : alphaLock.maxWaitTime();
+    }
+
+    /**
+     * 获取租约时长
+     *
+     * @param alphaLock
+     * @return
+     */
+    private long getLeaseTime(AlphaLock alphaLock) {
+        //todo 设定默认值
+        return alphaLock.leaseTime() == Long.MIN_VALUE ? 60 : alphaLock.leaseTime();
     }
 }
