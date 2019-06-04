@@ -9,6 +9,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import java.util.Map;
  * @Auther mikicomo
  * @Date 2019-05-31 17:02
  */
+@Component
 public class LockInfoAnalyseHandler {
 
     private Logger logger = LoggerFactory.getLogger(getClass());

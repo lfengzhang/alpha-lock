@@ -15,12 +15,15 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * @Description 切面加锁处理类
  * @Auther mikicomo
  * @Date 2019-05-31 17:00
  */
+@Component
 @Aspect
 public class LockAspectHandler {
 
@@ -29,9 +32,11 @@ public class LockAspectHandler {
     private ThreadLocal<Lock> currentThreadLock = new ThreadLocal<>();
     private ThreadLocal<LockStatus> currentThreadLockStat = new ThreadLocal<>();
 
-    private LockInfoAnalyseHandler lockInfoAnalyseHandler = new LockInfoAnalyseHandler();
+    @Autowired
+    private LockInfoAnalyseHandler lockInfoAnalyseHandler;
 
-    private LockFactory lockFactory = new LockFactory();
+    @Autowired
+    private LockFactory lockFactory;
 
     /**
      * 执行前置处理流

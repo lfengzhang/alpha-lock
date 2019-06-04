@@ -1,20 +1,23 @@
 package net.h2so;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-{
-    /**
-     * Rigorous Test :-)
-     */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {SpringConfigManagerTest.class})
+public class AppTest {
+
+    @Autowired
+    private LockService lockService;
+
     @Test
-    public void shouldAnswerWithTrue()
-    {
-        assertTrue( true );
+    public void simpleTest() throws Exception {
+        lockService.getValue("22");
     }
 }

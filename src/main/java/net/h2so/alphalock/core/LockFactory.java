@@ -5,12 +5,14 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * @Description Lock 工厂类
  * @Auther mikicomo
  * @Date 2019-05-31 16:03
  */
+@Component
 public class LockFactory {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
