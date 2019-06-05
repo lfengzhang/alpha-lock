@@ -1,10 +1,10 @@
 package net.h2so.alphalock.core;
 
 import net.h2so.alphalock.model.LockInfo;
-import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,7 +17,8 @@ public class LockFactory {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private RedissonClient redissonClient = Redisson.create();
+    @Autowired
+    private RedissonClient redissonClient;
 
     /**
      * 获取锁
