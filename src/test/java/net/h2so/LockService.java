@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LockService {
 
-    @AlphaLock(maxWaitTime = 10, leaseTime = 60, keys = {"#param", "#param"})
+    @AlphaLock(maxWaitTime = 10, leaseTime = 60, keys = {})
     public String getValue(String param) throws Exception {
 
         System.out.printf("get value param start...");

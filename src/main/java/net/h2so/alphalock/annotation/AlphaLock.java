@@ -1,6 +1,8 @@
 package net.h2so.alphalock.annotation;
 
+import net.h2so.alphalock.enums.LockTimeOutStrategy;
 import net.h2so.alphalock.enums.LockType;
+import net.h2so.alphalock.enums.ReleaseTimeOutStrategy;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -43,6 +45,20 @@ public @interface AlphaLock {
      * @return leaseTime
      */
     long leaseTime() default Long.MIN_VALUE;
+
+    /**
+     * 释放锁超时策略
+     *
+     * @return
+     */
+    ReleaseTimeOutStrategy releaseTimeOutStrategy() default ReleaseTimeOutStrategy.IGNORE;
+
+    /**
+     * 加锁超时策略
+     *
+     * @return
+     */
+    LockTimeOutStrategy lockTimeOutStrategy() default LockTimeOutStrategy.IGNORE;
 
     /**
      * 业务key值

@@ -149,7 +149,7 @@ public class LockInfoAnalyseHandler {
         for (String alphaKey : alphaKeys) {
             if (StringUtils.isNotEmpty(alphaKey)) {
                 Object value = elParseMap.get(alphaKey);
-                if (value != null){
+                if (value != null) {
                     completeDefinition = completeDefinition.replace(alphaKey, value.toString());
                 }
             }

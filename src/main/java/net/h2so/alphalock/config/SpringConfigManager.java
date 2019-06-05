@@ -18,7 +18,7 @@ import org.springframework.util.ClassUtils;
  */
 @Configuration
 @ComponentScan(basePackages = "net.h2so.alphalock")
-@PropertySource(value = { "classpath:lock.properties"}, ignoreResourceNotFound = true)
+@PropertySource(value = {"classpath:lock.properties"}, ignoreResourceNotFound = true)
 @EnableAspectJAutoProxy
 public class SpringConfigManager {
 

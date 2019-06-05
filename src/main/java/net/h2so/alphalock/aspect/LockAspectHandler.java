@@ -4,7 +4,6 @@ import net.h2so.alphalock.annotation.AlphaLock;
 import net.h2so.alphalock.core.Lock;
 import net.h2so.alphalock.core.LockFactory;
 import net.h2so.alphalock.core.LockInfoAnalyseHandler;
-import net.h2so.alphalock.exception.AlphaLockTimeOutException;
 import net.h2so.alphalock.model.LockInfo;
 import net.h2so.alphalock.model.LockStatus;
 import org.aspectj.lang.JoinPoint;
@@ -55,8 +54,8 @@ public class LockAspectHandler {
 
         if (!lockRes) {
             logger.warn("Timeout while acquiring Lock({})", lockInfo.getName());
-            //todo 暂时做抛出异常处理, 后续增加超时处理策略
-            throw new AlphaLockTimeOutException("Timeout while acquiring Lock");
+            //执行指定的策略
+            alphaLock.lockTimeOutStrategy().handle(lockInfo, lock, joinPoint);
         }
 
         currentThreadLock.set(lock);
@@ -113,13 +112,18 @@ public class LockAspectHandler {
      */
     private void releaseLock(AlphaLock alphaLock, JoinPoint joinPoint) throws Throwable {
         logger.debug("Aspect action => releaseLock");
+
+        LockInfo lockInfo = lockInfoAnalyseHandler.get(joinPoint, alphaLock);
+        Lock lock = lockFactory.getLock(lockInfo);
+
         LockStatus lockStat = currentThreadLockStat.get();
         if (lockStat.getHold()) {
             boolean releaseRes = currentThreadLock.get().release();
             lockStat.setHold(false);
             if (!releaseRes) {
                 logger.error("Aspect action => releaseLock fail");
-                /*todo 释放锁超时处理机制处理, 暂时不做处理*/
+                //执行指定的策略
+                alphaLock.releaseTimeOutStrategy().handle(lockInfo, lock, joinPoint);
             }
         }
     }
