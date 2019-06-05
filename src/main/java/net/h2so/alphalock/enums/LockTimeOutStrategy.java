@@ -39,15 +39,27 @@ public enum LockTimeOutStrategy implements LockTimeOutHandler {
      * 重试
      */
     RETRY() {
+
+        private static final int MAX_RETRY_NUM = 3;
+
         @Override
         public void handle(LockInfo lockInfo, Lock lock, JoinPoint joinPoint) {
             /**
              * 默认重试三次
              * todo 重试次数支持可配置
              */
+            int num = 0;
 
+            while (!lock.acquire()) {
+
+                if (MAX_RETRY_NUM < num) {
+                    String errorMsg = String.format("ReTry acquire Lock(%s) %d times but fail",
+                            lockInfo.getName(), MAX_RETRY_NUM);
+                    throw new AlphaLockTimeOutException(errorMsg);
+                }
+                num++;
+            }
         }
-    }
-    ;
+    };
 
 }
