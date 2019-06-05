@@ -5,10 +5,11 @@ import net.h2so.alphalock.enums.LockType;
 import net.h2so.alphalock.exception.AlphaLockInvokeException;
 import net.h2so.alphalock.model.LockInfo;
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -25,6 +26,9 @@ public class LockInfoAnalyseHandler {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired
+    private SpELParser elParser;
+
     /**
      * 获得锁的KeyName
      * 格式: 全类名.方法名-{kValue1}-{kValue2}
@@ -33,7 +37,7 @@ public class LockInfoAnalyseHandler {
      * @param alphaLock
      * @return
      */
-    public String getLockKeyName(ProceedingJoinPoint joinPoint, AlphaLock alphaLock) {
+    public String getLockKeyName(JoinPoint joinPoint, AlphaLock alphaLock) {
 
         Method method = getMethod(joinPoint);
 
@@ -57,7 +61,7 @@ public class LockInfoAnalyseHandler {
      * @param alphaLock
      * @return
      */
-    public LockInfo get(ProceedingJoinPoint joinPoint, AlphaLock alphaLock) {
+    public LockInfo get(JoinPoint joinPoint, AlphaLock alphaLock) {
         logger.debug("get lockInfo ... ");
         LockType type = alphaLock.lockType();
         String lockName = getLockKeyName(joinPoint, alphaLock);
@@ -73,7 +77,7 @@ public class LockInfoAnalyseHandler {
      * @param joinPoint
      * @return
      */
-    private Method getMethod(ProceedingJoinPoint joinPoint) {
+    private Method getMethod(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
 
@@ -121,7 +125,7 @@ public class LockInfoAnalyseHandler {
      * @param method
      * @return
      */
-    private String replaceKeyWithBusinessValue(String completeDefinition, String[] alphaKeys, Method method, ProceedingJoinPoint joinPoint) {
+    private String replaceKeyWithBusinessValue(String completeDefinition, String[] alphaKeys, Method method, JoinPoint joinPoint) {
 
         if (StringUtils.isEmpty(completeDefinition)) {
             logger.error("completeDefinition is empty");
@@ -140,10 +144,14 @@ public class LockInfoAnalyseHandler {
             argMap.put(argNames[i], argValues[i]);
         }
 
+        Map<String, Object> elParseMap = elParser.parseExpValue(alphaKeys, argMap);
+
         for (String alphaKey : alphaKeys) {
             if (StringUtils.isNotEmpty(alphaKey)) {
-                Object value = argMap.get(alphaKey);
-                completeDefinition.replace(alphaKey, value.toString());
+                Object value = elParseMap.get(alphaKey);
+                if (value != null){
+                    completeDefinition = completeDefinition.replace(alphaKey, value.toString());
+                }
             }
         }
 

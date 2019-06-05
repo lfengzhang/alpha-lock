@@ -8,7 +8,6 @@ import net.h2so.alphalock.exception.AlphaLockTimeOutException;
 import net.h2so.alphalock.model.LockInfo;
 import net.h2so.alphalock.model.LockStatus;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
@@ -47,7 +46,7 @@ public class LockAspectHandler {
      * @throws Throwable
      */
     @Before(value = "@annotation(alphaLock)")
-    public Object before(ProceedingJoinPoint joinPoint, AlphaLock alphaLock) throws Throwable {
+    public void before(JoinPoint joinPoint, AlphaLock alphaLock) throws Throwable {
         logger.debug("Aspect moment => before ... ");
         LockInfo lockInfo = lockInfoAnalyseHandler.get(joinPoint, alphaLock);
         currentThreadLockStat.set(new LockStatus(lockInfo, false));
@@ -62,7 +61,6 @@ public class LockAspectHandler {
 
         currentThreadLock.set(lock);
         currentThreadLockStat.get().setHold(true);
-        return joinPoint.proceed();
     }
 
     /**

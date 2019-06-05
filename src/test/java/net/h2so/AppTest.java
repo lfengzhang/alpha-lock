@@ -17,7 +17,14 @@ public class AppTest {
     private LockService lockService;
 
     @Test
-    public void simpleTest() throws Exception {
+    public void simpleTest1() throws Exception {
         lockService.getValue("22");
     }
+
+    @Test
+    public void simpleTest2() throws Exception {
+        ObjectParam objectParam = new ObjectParam("id", "name", false);
+        lockService.getValue(objectParam);
+    }
+
 }

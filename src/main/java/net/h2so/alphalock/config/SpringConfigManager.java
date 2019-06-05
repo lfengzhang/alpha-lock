@@ -2,6 +2,7 @@ package net.h2so.alphalock.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * @Description Spring配置
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan(basePackages = "net.h2so.alphalock")
+@EnableAspectJAutoProxy
 public class SpringConfigManager {
 
 }
