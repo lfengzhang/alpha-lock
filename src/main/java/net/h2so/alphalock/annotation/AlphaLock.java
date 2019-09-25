@@ -58,7 +58,7 @@ public @interface AlphaLock {
      *
      * @return
      */
-    LockTimeOutStrategy lockTimeOutStrategy() default LockTimeOutStrategy.IGNORE;
+    LockTimeOutStrategy lockTimeOutStrategy() default LockTimeOutStrategy.FAILURE;
 
     /**
      * 业务key值
